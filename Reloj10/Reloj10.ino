@@ -104,7 +104,7 @@ void setup()
 void loop()
 {
   
-  int seg = ((millis() - setSeg)/ 1000) % 60; //sacamos los segundos de la funcion millis
+  int seg = ((millis() - setSeg) / 1000) % 60; //sacamos los segundos de la funcion millis
   int mn = (((millis() - setSeg) / 1000) + setMin) / 60;   //sacamos los minutos de la funcion millis
   int hrs = ((mn / 60) + setHrs) % 24;
 
@@ -175,10 +175,10 @@ void loop()
   else if(estado == 2) //Animacion
   {
 
-    prender[0] = 15;
-    prender[1] = 0;
+    prender[0] = 7;
+    prender[1] = 3;
     prender[2] = 15;
-    prender[3] = 0;
+    prender[3] = 1;
 
     if(!digitalRead(botones[1]) && bk2 == 0)
       bk2 = 1;
@@ -229,7 +229,8 @@ void loop()
   
   prenderLED(contador, prender[contador]);
 
-  //prenderLED(0, estado);
+  //prenderLED(1, 15);
+  //prenderLED(2, 2);
 
   contador++;
   
