@@ -16,8 +16,19 @@ F0|_||_|:|_||_|
 
 */
 
+int b1 = 0;
+int b2 = 0;
+int b3 = 0;
+
+int bk1 = 0;
+int bk2 = 0;
+
 int contador = 0;
-int cambio = 0;
+int estado = 0;
+
+int setHrs = 0;
+int setMin = 0;
+int setSeg = 0;
 
 void apagarTodo()
 {
@@ -43,18 +54,30 @@ void prenderLED(int columna, byte fila)
   
 }
 
-void debugBotones()
+void debugHora(int mn, int seg)
 {
 
-  for(int i = 0; i < 3; i++)
-  {
+  Serial.print("millis: ");
+  Serial.print(millis());
+  Serial.print("\tHora: ");
+  Serial.print(mn);
+  Serial.print(":");
+  Serial.println(seg);
+  
+}
 
-    Serial.print(digitalRead(botones[i]));
-    Serial.print("\t");
-    
-  }
+void debugBotones()
+{
+  
+  apagarTodo();
+  if(!digitalRead(botones[0]))
+    prenderLED(0, 1);
 
-  Serial.println();
+  if(!digitalRead(botones[1]))
+    prenderLED(1, 1);
+
+  if(!digitalRead(botones[2]))
+    prenderLED(2, 1);  
   
 }
 
@@ -81,51 +104,136 @@ void setup()
 void loop()
 {
   
-  int seg = (millis() / 1000) % 60; //sacamos los segundos de la funcion millis
-  int mn = (millis() / 1000) / 60;   //sacamos los minutos de la funcion millis
+  int seg = ((millis() - setSeg)/ 1000) % 60; //sacamos los segundos de la funcion millis
+  int mn = (((millis() - setSeg) / 1000) + setMin) / 60;   //sacamos los minutos de la funcion millis
+  int hrs = ((mn / 60) + setHrs) % 24;
+
+  prender[0] = 0;
+  prender[1] = 0;
+  prender[2] = 0;
+  prender[3] = 0;
 
   //debugBotones();
+  //debugHora(mn, seg);
 
-  prender[0] = seg % 10; //digito 1 de los segundos
-  prender[1] = seg / 10; //digito 2 de los segundos
-  prender[2] = mn % 10;
-  prender[3] = mn / 10;
+  if(!digitalRead(botones[0]) && b1 == 0)
+    b1 = 1;
+
+  if(digitalRead(botones[0]) && b1 == 1)
+  {
+    
+    estado++;
+
+    if(estado > 3)
+      estado = 0;
+
+    b1 = 0;
+    
+  }
+
+  if(estado == 0) //Muestra horas y minutos
+  {
+    
+    prender[0] = mn % 10;
+    prender[1] = (mn / 10) % 6;
+    prender[2] = hrs % 10;
+    prender[3] = hrs / 10;
+
+    if(mn == 0 && hrs == 0)
+    {
+      
+      prender[0] = 15;
+      prender[1] = 15;
+      prender[2] = 15;
+      prender[3] = 15;
+      
+    }
+    
+  }
+
+  else if(estado == 1) //Segundos
+  {
+    
+    prender[0] = seg % 10; //digito 1 de los segundos
+    prender[1] = seg / 10; //digito 2 de los segundos
+    prender[2] = 0;
+    prender[3] = 0;
+
+    if(!digitalRead(botones[1]) && bk1 == 0)
+      bk1 = 1;
+
+    if(digitalRead(botones[1]) && bk1 == 1)
+    {
+
+      estado--;
+      bk1 = 0;
+      
+    }
   
-  //prenderLED(contador, prender[contador]);
+  }
 
-  apagarTodo();
+  else if(estado == 2) //Animacion
+  {
 
-  if(!digitalRead(botones[0]))
-    prenderLED(0, 1);
+    prender[0] = 15;
+    prender[1] = 0;
+    prender[2] = 15;
+    prender[3] = 0;
 
-  if(!digitalRead(botones[1]))
-    prenderLED(1, 1);
+    if(!digitalRead(botones[1]) && bk2 == 0)
+      bk2 = 1;
 
-  if(!digitalRead(botones[2]))
-    prenderLED(2, 1);
+    if(digitalRead(botones[1]) && bk2 == 1)
+    {
 
-  /*digitalWrite(6, LOW);
-  digitalWrite(A1, LOW);
-  digitalWrite(A2, LOW);
-  digitalWrite(A3, LOW);
-  digitalWrite(7, HIGH);
-  delay(500);
-  apagarTodo();
-  delay(500);*/
+      estado--;
+      bk2 = 0;
+      
+    }
+    
+  }
 
-  //delayMicroseconds(3);
+  else if(estado == 3)
+  {
+
+    prender[0] = mn % 10;
+    prender[1] = (mn / 10) % 6;
+    prender[2] = hrs % 10;
+    prender[3] = hrs / 10;
+
+    if(!digitalRead(botones[1]) && b2 == 0)
+      b2 = 1;
+
+    if(digitalRead(botones[1]) && b2 == 1)
+    {
+
+      setMin += 60;
+      b2 = 0;
+      
+    }
+
+    if(!digitalRead(botones[2]) && b3 == 0)
+      b3 = 1;
+
+    if(digitalRead(botones[2]) && b3 == 1)
+    {
+
+      setHrs++;
+      b3 = 0;
+      
+    }
+    
+    setSeg = millis();
+    
+  }
+  
+  prenderLED(contador, prender[contador]);
+
+  //prenderLED(0, estado);
+
   contador++;
   
   if(contador > 3)
     contador = 0;
-  
-  /*Serial.print("millis: ");
-  Serial.print(millis());
-  Serial.print("\tHora: ");
-  Serial.print(m2);
-  Serial.print(m1);
-  Serial.print(":");
-  Serial.print(s2);
-  Serial.println(s1);*/
-
+    
 }
