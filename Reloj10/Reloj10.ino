@@ -139,7 +139,7 @@ void loop()
     prender[2] = hrs % 10;
     prender[3] = hrs / 10;
 
-    if(mn == 0 && hrs == 0)
+    if(mn == 0 && hrs == 0) //Easter Egg
     {
       
       prender[0] = 15;
