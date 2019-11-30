@@ -175,10 +175,10 @@ void loop()
   else if(estado == 2) //Animacion
   {
 
-    prender[0] = 7;
-    prender[1] = 3;
-    prender[2] = 15;
-    prender[3] = 1;
+    prender[0] = 3;
+    prender[1] = 5;
+    prender[2] = 1;
+    prender[3] = 0;
 
     if(!digitalRead(botones[1]) && bk2 == 0)
       bk2 = 1;
